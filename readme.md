@@ -1,13 +1,43 @@
-###Bike-Shop
+# Bike-Shop API
 
-####This is a bike shop api that allows users to browse and purchase bikes. The website is built using React, Redux, and Node.js. The backend is built using Node.js and Express, and the database is MongoDB. The website is deployed on Heroku.
+## Overview
 
-####Set Up:
+The **Bike-Shop API** is a backend application for a bike shop API that allows to browse and purchase bikes. The API is built using **Typescript**, **Mongoose**, , **Node.js**,, **Express**, and **Eslint**. The application is deployed on **Vercel**.
 
-```
-express with ts
-Node ,
-mongoose connection
-dot env
-eslint
-```
+---
+
+## Features
+
+- Browse available bikes
+- Create A bike
+- Get Bike
+- Admin panel for bike management
+
+---
+
+## Tech Stack
+
+### Backend
+
+- **Node.js**
+- **Express.js** (with TypeScript)
+- **MongoDB** (via Mongoose)
+- **dotenv** (for environment variable management)
+- **ESLint** (for code quality and consistency)
+
+### Deployment
+
+- Hosted on **Vercel**
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+
+- **Node.js**
+- **MongoDB**
+- **npm**
+- **Typescript**
+
+### Installation
