@@ -19,9 +19,17 @@ const getroductByIdFromDb = async (id: string) => {
   }
   return result;
 };
-
+const deleteProductFromDb = async (id: string) => {
+  const alreadyDeleted = await Bike.findById(id);
+  if (alreadyDeleted?.isDeleted as boolean) {
+    throw new Error("Bike already deleted");
+  }
+  const result = await Bike.findByIdAndUpdate(id, { isDeleted: true });
+  return result;
+};
 export const productService = {
   createProductsInDb,
   getProductDataFromDb,
   getroductByIdFromDb,
+  deleteProductFromDb,
 };

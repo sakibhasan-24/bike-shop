@@ -1,5 +1,6 @@
 import mongoose, { model, Schema } from "mongoose";
 import TProducts from "./products.interface";
+import { NextFunction } from "express";
 
 const BikeModel = new Schema<TProducts>(
   {
@@ -40,8 +41,19 @@ const BikeModel = new Schema<TProducts>(
       },
       required: [true, "The category field is required."],
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
+BikeModel.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+
+  this.select("-isDeleted");
+  next();
+});
 const Bike = model<TProducts>("Product", BikeModel);
+
 export default Bike;

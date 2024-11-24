@@ -11,7 +11,7 @@ const createProduct = async (req: Request, res: Response) => {
     console.log(bikeValidateData, "jod");
     const result = await productService.createProductsInDb(bikeValidateData);
     res.status(201).json({
-      success: true,
+      status: true,
       message: "Product created successfully",
       data: result,
     });
@@ -19,14 +19,14 @@ const createProduct = async (req: Request, res: Response) => {
     if (error instanceof ZodError) {
       res.status(500).json({
         message: "Validation Failed",
-        success: false,
+        status: false,
         error: error,
         stack: error?.stack,
       });
     } else {
       res.status(500).json({
         message: "Validation Failed",
-        success: false,
+        status: false,
         error: error,
         stack: error?.stack,
       });
@@ -52,19 +52,19 @@ const getProducts = async (req: Request, res: Response) => {
     if (result?.length < 1) {
       res.status(200).json({
         message: "No Bike Found",
-        success: false,
+        status: false,
       });
     } else {
       res.status(200).json({
         message: "Bikes retrieved successfully",
-        success: true,
+        status: true,
         data: result,
       });
     }
   } catch (error: any) {
     res.status(500).json({
       message: "Something Went Wrong",
-      success: false,
+      status: false,
       error: error,
       stack: error?.stack || "No stack Error",
     });
@@ -77,15 +77,34 @@ const getProductsById = async (req: Request, res: Response) => {
     );
     res.status(200).json({
       message: "Bike retrieved successfully",
-      success: true,
+      status: true,
       data: result,
     });
   } catch (error: any) {
     res.status(500).json({
       message: error.message,
-      success: false,
+      status: false,
       error: error,
       stack: error?.stack,
+    });
+  }
+};
+const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const result = await productService.deleteProductFromDb(
+      req.params.productId
+    );
+    res.status(200).json({
+      message: "Bike deleted successfully",
+      status: true,
+      data: [],
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+      status: false,
+      error: error,
+      stack: error?.stack || "No stack Error",
     });
   }
 };
@@ -93,4 +112,5 @@ export const productController = {
   createProduct,
   getProducts,
   getProductsById,
+  deleteProduct,
 };

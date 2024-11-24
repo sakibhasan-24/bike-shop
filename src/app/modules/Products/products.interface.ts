@@ -12,6 +12,7 @@ type TProducts = {
   description: string;
   quantity: number;
   inStock: boolean;
+  isDeleted?: boolean;
   category: BikeCategory;
 };
 
