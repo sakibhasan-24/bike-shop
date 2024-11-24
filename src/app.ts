@@ -1,13 +1,11 @@
-import express from 'express';
+import express from "express";
 const app = express();
-import cors from 'cors';
+import cors from "cors";
+import { bikeRoutes } from "./app/modules/Products/products.routes";
 // const port = 3000;
 app.use(express.json());
 app.use(cors());
-app.get('/', (req, res) => {
-  const a = 10;
 
-  res.send(a);
-});
+app.use("/api", bikeRoutes);
 
 export default app;
