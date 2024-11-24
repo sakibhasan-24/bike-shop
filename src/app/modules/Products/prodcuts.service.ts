@@ -7,7 +7,12 @@ const createProductsInDb = async (product: TProducts) => {
   const result = await bikeResult.save();
   return result;
 };
+const getProductDataFromDb = async (searchTerm = {}) => {
+  const result = await Bike.find(searchTerm);
+  return result;
+};
 
 export const productService = {
   createProductsInDb,
+  getProductDataFromDb,
 };

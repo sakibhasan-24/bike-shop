@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { productSchemaValidation } from "./products.validation";
 import { ZodError } from "zod";
 import { productService } from "./prodcuts.service";
+import Bike from "./products.model";
 
 const createProduct = async (req: Request, res: Response) => {
   const bikeData = req.body;
@@ -32,6 +33,44 @@ const createProduct = async (req: Request, res: Response) => {
     }
   }
 };
+const getProducts = async (req: Request, res: Response) => {
+  let query = {};
+
+  if (req.query.searchTerm) {
+    query = {
+      $or: [
+        { name: { $regex: req.query.searchTerm, $options: "i" } },
+        { brand: { $regex: req.query.searchTerm, $options: "i" } },
+        { category: { $regex: req.query.searchTerm, $options: "i" } },
+      ],
+    };
+  }
+  //   console.log(req.query, "query");
+
+  try {
+    const result = await productService.getProductDataFromDb(query);
+    if (result?.length < 1) {
+      res.status(200).json({
+        message: "No Bike Found",
+        success: false,
+      });
+    } else {
+      res.status(200).json({
+        message: "Bikes retrieved successfully",
+        success: true,
+        data: result,
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Something Went Wrong",
+      success: false,
+      error: error,
+      stack: error?.stack || "No stack Error",
+    });
+  }
+};
 export const productController = {
   createProduct,
+  getProducts,
 };

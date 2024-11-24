@@ -9,7 +9,7 @@ const BikeModel = new Schema<TProducts>(
     },
     brand: {
       type: String,
-      required: [true, "brand filed must be required"],
+      required: [true, "brand field must be required"],
     },
     price: {
       type: Number,
