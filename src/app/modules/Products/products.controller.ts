@@ -70,7 +70,27 @@ const getProducts = async (req: Request, res: Response) => {
     });
   }
 };
+const getProductsById = async (req: Request, res: Response) => {
+  try {
+    const result = await productService.getroductByIdFromDb(
+      req.params.productId
+    );
+    res.status(200).json({
+      message: "Bike retrieved successfully",
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+      success: false,
+      error: error,
+      stack: error?.stack,
+    });
+  }
+};
 export const productController = {
   createProduct,
   getProducts,
+  getProductsById,
 };
