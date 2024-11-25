@@ -53,6 +53,12 @@ BikeModel.pre("find", function (next) {
   this.select("-isDeleted");
   next();
 });
+BikeModel.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+
+  this.select("-isDeleted");
+  next();
+});
 const Bike = model<TProducts>("Product", BikeModel);
 
 export default Bike;
