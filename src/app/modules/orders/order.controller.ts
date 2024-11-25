@@ -3,6 +3,7 @@ import Bike from "../Products/products.model";
 import { orderSchemaValidation } from "./order.validation";
 import Order from "./order.model";
 import { ZodError } from "zod";
+import { OrderService } from "./order.service";
 
 const createOrder = async (req: Request, res: Response): Promise<any> => {
   //   console.log(req.body);
@@ -43,7 +44,7 @@ const createOrder = async (req: Request, res: Response): Promise<any> => {
       { new: true }
     );
     const newTotalPrice = quantity * findProduct?.price;
-    const createOrder = await Order.create(validateData);
+    const createOrder = await OrderService.createOrderInDb(validateData);
     const orderObject = createOrder.toObject();
     const newData = { ...orderObject, totalPrice: newTotalPrice };
     return res.status(201).json({
@@ -71,7 +72,44 @@ const createOrder = async (req: Request, res: Response): Promise<any> => {
 
   //   console.log(findProduct);
 };
+const getRevenue = async (req: Request, res: Response) => {
+  try {
+    const result = await OrderService.getRevenueFromOrder();
+    // console.log(result);
+    res.status(200).json({
+      message: "Revenue fetched successfully",
+      status: true,
+      data: {
+        totalRevenue: result,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      status: false,
+      error: error,
+    });
+  }
+};
 
+const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const result = await OrderService.getAllOrders();
+    res.status(200).json({
+      message: "Orders fetched successfully",
+      status: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      status: false,
+      error: error,
+    });
+  }
+};
 export const orderController = {
   createOrder,
+  getRevenue,
+  getAllOrders,
 };
