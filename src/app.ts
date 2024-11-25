@@ -6,12 +6,7 @@ import { orderRoutes } from "./app/modules/orders/orders.routes";
 // const port = 3000;
 app.use(express.json());
 app.use(cors());
-app.use((req, res) => {
-  res.status(200).json({
-    status: true,
-    message: "welcome our bike shop server",
-  });
-});
+
 app.use("/api", bikeRoutes);
 app.use("/api", orderRoutes);
 
