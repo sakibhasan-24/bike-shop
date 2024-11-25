@@ -12,7 +12,7 @@ const getProductDataFromDb = async (searchTerm = {}) => {
 };
 
 const getroductByIdFromDb = async (id: string) => {
-  const result = await Bike.findById(id);
+  const result = await Bike.findOne({ _id: id });
   console.log(id, "ser");
   if (!result) {
     throw new Error("Bike not found");
