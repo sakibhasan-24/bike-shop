@@ -1,6 +1,5 @@
 import mongoose, { model, Schema } from "mongoose";
 import TProducts from "./products.interface";
-import { NextFunction } from "express";
 
 const BikeModel = new Schema<TProducts>(
   {
@@ -24,7 +23,7 @@ const BikeModel = new Schema<TProducts>(
     quantity: {
       type: Number,
       required: true,
-      min: 1,
+      min: 0,
     },
     inStock: {
       type: Boolean,

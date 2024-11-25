@@ -27,9 +27,18 @@ const deleteProductFromDb = async (id: string) => {
   const result = await Bike.findByIdAndUpdate(id, { isDeleted: true });
   return result;
 };
+const updateProductInDb = async (id: string, data: object) => {
+  const result = await Bike.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  });
+  console.log(result, "result");
+  return result;
+};
 export const productService = {
   createProductsInDb,
   getProductDataFromDb,
   getroductByIdFromDb,
   deleteProductFromDb,
+  updateProductInDb,
 };

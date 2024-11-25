@@ -16,7 +16,7 @@ export const productSchemaValidation = z.object({
   brand: z.string().min(1, "Brand is required"),
   price: z.number().min(1, "Price must be at least 1"),
   description: z.string().min(1, "Description is required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
+  quantity: z.number().min(0, "Quantity can not be negative"),
   inStock: z.boolean(),
   isDeleted: z.boolean().optional(),
   category: BikeCategoryEnum,

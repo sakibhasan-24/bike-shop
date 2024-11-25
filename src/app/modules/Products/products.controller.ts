@@ -8,7 +8,7 @@ const createProduct = async (req: Request, res: Response) => {
   const bikeData = req.body;
   try {
     const bikeValidateData = productSchemaValidation.parse(bikeData);
-    console.log(bikeValidateData, "jod");
+    // console.log(bikeValidateData, "jod");
     const result = await productService.createProductsInDb(bikeValidateData);
     res.status(201).json({
       status: true,
@@ -108,9 +108,30 @@ const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
+const updateProduct = async (req: Request, res: Response) => {
+  try {
+    const result = await productService.updateProductInDb(
+      req.params.productId,
+      req.body
+    );
+    res.status(200).json({
+      message: "Bike updated successfully",
+      status: true,
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+      status: false,
+      error: error,
+      stack: error?.stack || "No stack Error",
+    });
+  }
+};
 export const productController = {
   createProduct,
   getProducts,
   getProductsById,
   deleteProduct,
+  updateProduct,
 };
