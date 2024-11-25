@@ -86,4 +86,4 @@ npm run dev
 ### GET/Orders/revenue
 
 - **Description**:apply aggregation pipeline for Know total revenue from orders.
-- **Response**: An array of Order objects with total revenue.
+- **Response**: An array of Order objects with total revenueR.
