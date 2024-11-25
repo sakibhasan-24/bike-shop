@@ -44,7 +44,10 @@ const createOrder = async (req: Request, res: Response): Promise<any> => {
       { new: true }
     );
     const newTotalPrice = quantity * findProduct?.price;
-    const createOrder = await OrderService.createOrderInDb(validateData);
+    const orderData = { ...validateData, totalPrice: newTotalPrice };
+
+    const createOrder = await OrderService.createOrderInDb(orderData);
+
     const orderObject = createOrder.toObject();
     const newData = { ...orderObject, totalPrice: newTotalPrice };
     return res.status(201).json({
