@@ -4,6 +4,8 @@
 
 ## Overview
 
+<!-- need registration,login,jwt,logout,token,payment -->
+
 The **Bike-Shop API** is a backend application for a bike shop API that allows to browse and purchase bikes. The API is built using **Typescript**, **Mongoose**, , **Node.js**,, **Express**, and **Eslint**. The application is deployed on **Vercel**.
 
 ---
