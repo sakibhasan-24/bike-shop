@@ -9,3 +9,8 @@ async function main() {
   });
 }
 main();
+
+// src/app/modules/products/products.service.ts
+//install cloudinary
+//install jwt
+//install bcrypt
