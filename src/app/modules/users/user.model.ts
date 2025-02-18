@@ -34,10 +34,5 @@ userModel.pre("save", async function (next) {
   next();
 });
 
-//compare the password
-userModel.methods.comparePassword = async function (password: string) {
-  const user = this as TUser;
-  return bcrypt.compareSync(password, user.password);
-};
 const User = model<TUser>("User", userModel);
 export default User;

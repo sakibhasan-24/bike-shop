@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import bcryptjs from "bcryptjs";
-import jwt from "jsonwebtoken";
 import catchAsync from "../../../middlewares/catchAsync";
 import { TUser } from "./user.interface";
 import AppError from "../../../utils/AppError";
 import User from "./user.model";
 import { userSchemaValidation } from "./user.validation";
-import config from "../../config";
+import generateToken from "../../../utils/generateToken";
 
 const userSignUp = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -26,9 +25,16 @@ const userSignUp = catchAsync(
       throw new AppError(400, "Email already exists");
     }
     const newUser = await User.create(userData);
-    res.status(200).json({
+    const token = generateToken({
+      id: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
+    });
+
+    res.status(201).json({
       message: "User registered successfully",
       status: true,
+      token,
       user: {
         id: newUser._id,
         name: newUser.name,
@@ -38,3 +44,49 @@ const userSignUp = catchAsync(
     });
   }
 );
+
+const userLogin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    //1) take data properly
+    //2) validate data using zod
+    //3) user exists or not
+    //4) compare password with hashed password
+    //5) generate jwt token
+    const { email, password } = req.body;
+    if (!email || !password) {
+      throw new AppError(400, "All fields are required");
+    }
+    const userData = userSchemaValidation.parse({ email, password });
+    const user = await User.findOne({ email: userData?.email });
+
+    if (!user) {
+      throw new AppError(401, "Invalid email or password");
+    }
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new AppError(401, "Invalid email or password");
+    }
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    res.json({
+      message: "User logged in successfully",
+      status: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  }
+);
+
+export const userController = {
+  userSignUp,
+  userLogin,
+};
