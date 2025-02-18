@@ -7,7 +7,9 @@ export const userSchemaValidation = z.object({
     .max(50, "Name cannot exceed 50 characters"),
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
-  role: z.enum(["customer", "admin"], {
-    message: "Role must be either 'customer' or 'admin'",
-  }),
+  role: z
+    .enum(["customer", "admin"], {
+      message: "Role must be either 'customer' or 'admin'",
+    })
+    .default("customer"),
 });
