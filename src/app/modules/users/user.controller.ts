@@ -6,6 +6,7 @@ import AppError from "../../../utils/AppError";
 import User from "./user.model";
 import { userSchemaValidation } from "./user.validation";
 import generateToken from "../../../utils/generateToken";
+import config from "../../config";
 
 const userSignUp = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -26,9 +27,15 @@ const userSignUp = catchAsync(
     }
     const newUser = await User.create(userData);
     const token = generateToken({
-      id: newUser.id,
+      id: newUser._id,
       email: newUser.email,
       role: newUser.role,
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
     res.status(201).json({
@@ -72,6 +79,11 @@ const userLogin = catchAsync(
       role: user.role,
     });
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: config.NODE_ENV === "production",
+      sameSite: "strict",
+    });
     res.json({
       message: "User logged in successfully",
       status: true,
