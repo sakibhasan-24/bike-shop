@@ -6,9 +6,15 @@ const createProductsInDb = async (product: TProducts) => {
   const result = await bikeResult.save();
   return result;
 };
-const getProductDataFromDb = async (searchTerm = {}) => {
-  const result = await Bike.find(searchTerm);
-  return result;
+
+const getProductDataFromDb = async ({ searchQuery, page, limit }: any) => {
+  const skip = (page - 1) * limit;
+
+  const totalCount = await Bike.countDocuments(searchQuery);
+
+  const data = await Bike.find(searchQuery).skip(skip).limit(limit).exec();
+
+  return { data, totalCount };
 };
 
 const getroductByIdFromDb = async (id: string) => {

@@ -34,7 +34,7 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 const getProducts = async (req: Request, res: Response) => {
-  let query = {};
+  let query: any = {};
 
   if (req.query.searchTerm) {
     query = {
@@ -46,10 +46,25 @@ const getProducts = async (req: Request, res: Response) => {
     };
   }
   //   console.log(req.query, "query");
+  // handle price ranges
+  if (req.query.minPrice || req.query.maxPrice) {
+    query.price = {
+      ...(req.query.minPrice ? { $gte: Number(req.query.minPrice) } : {}),
+      ...(req.query.maxPrice ? { $lte: Number(req.query.maxPrice) } : {}),
+    };
+  }
+  //handle paginations
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 3;
+  const skip = (page - 1) * limit;
 
   try {
-    const result = await productService.getProductDataFromDb(query);
-    if (result?.length < 1) {
+    const result = await productService.getProductDataFromDb({
+      searchQuery: query,
+      page,
+      limit,
+    });
+    if (result?.data.length < 1) {
       res.status(200).json({
         message: "No Bike Found",
         status: false,
@@ -59,6 +74,9 @@ const getProducts = async (req: Request, res: Response) => {
         message: "Bikes retrieved successfully",
         status: true,
         data: result,
+        total: result?.totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(result?.totalCount / limit),
       });
     }
   } catch (error: any) {

@@ -4,7 +4,7 @@ import catchAsync from "../../../middlewares/catchAsync";
 import { TUser } from "./user.interface";
 import AppError from "../../../utils/AppError";
 import User from "./user.model";
-import { userSchemaValidation } from "./user.validation";
+import { userLoginSchema, userSchemaValidation } from "./user.validation";
 import generateToken from "../../../utils/generateToken";
 import config from "../../config";
 
@@ -16,8 +16,9 @@ const userSignUp = catchAsync(
     //4) if no user then hashed password
     //5) save user in db
     const payload: TUser = req.body;
-    const { email, password, name, role } = payload;
-    if (!name || !role || !email || !password) {
+    console.log(payload);
+    const { email, password, name } = payload;
+    if (!name || !email || !password) {
       throw new AppError(400, "All fields are required");
     }
     const userData = userSchemaValidation.parse(payload);
@@ -54,18 +55,14 @@ const userSignUp = catchAsync(
 
 const userLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    //1) take data properly
-    //2) validate data using zod
-    //3) user exists or not
-    //4) compare password with hashed password
-    //5) generate jwt token
     const { email, password } = req.body;
+    console.log(req.body);
     if (!email || !password) {
       throw new AppError(400, "All fields are required");
     }
-    const userData = userSchemaValidation.parse({ email, password });
+    const userData = userLoginSchema.parse({ email, password });
     const user = await User.findOne({ email: userData?.email });
-
+    console.log(user, "from");
     if (!user) {
       throw new AppError(401, "Invalid email or password");
     }
@@ -98,6 +95,7 @@ const userLogin = catchAsync(
   }
 );
 
+// const userPasswordChange = catchAsync(async());
 export const userController = {
   userSignUp,
   userLogin,
