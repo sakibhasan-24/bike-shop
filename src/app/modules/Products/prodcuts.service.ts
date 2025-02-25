@@ -7,12 +7,21 @@ const createProductsInDb = async (product: TProducts) => {
   return result;
 };
 
-const getProductDataFromDb = async ({ searchQuery, page, limit }: any) => {
+const getProductDataFromDb = async ({
+  searchQuery,
+  page,
+  limit,
+  sortBy,
+}: any) => {
   const skip = (page - 1) * limit;
 
   const totalCount = await Bike.countDocuments(searchQuery);
 
-  const data = await Bike.find(searchQuery).skip(skip).limit(limit).exec();
+  const data = await Bike.find(searchQuery)
+    .skip(skip)
+    .limit(limit)
+    .sort(sortBy)
+    .exec();
 
   return { data, totalCount };
 };

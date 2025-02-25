@@ -27,6 +27,7 @@ const userSignUp = catchAsync(
       throw new AppError(400, "Email already exists");
     }
     const newUser = await User.create(userData);
+    console.log(newUser);
     const token = generateToken({
       id: newUser._id,
       email: newUser.email,

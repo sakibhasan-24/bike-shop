@@ -3,34 +3,43 @@ import { productSchemaValidation } from "./products.validation";
 import { ZodError } from "zod";
 import { productService } from "./prodcuts.service";
 import Bike from "./products.model";
+import { sendImageToCloudinary } from "../../../utils/cloudinary";
+import multer from "multer";
+export const upload = multer({ storage: multer.memoryStorage() });
 
 const createProduct = async (req: Request, res: Response) => {
-  const bikeData = req.body;
   try {
-    const bikeValidateData = productSchemaValidation.parse(bikeData);
-    // console.log(bikeValidateData, "jod");
-    const result = await productService.createProductsInDb(bikeValidateData);
-    res.status(201).json({
-      status: true,
-      message: "Product created successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    if (error instanceof ZodError) {
-      res.status(500).json({
-        message: "Validation Failed",
-        status: false,
-        error: error,
-        stack: error?.stack,
-      });
-    } else {
-      res.status(500).json({
-        message: "Validation Failed",
-        status: false,
-        error: error,
-        stack: error?.stack,
-      });
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Image file is missing" });
     }
+
+    // Upload image to Cloudinary
+    const result: any = await sendImageToCloudinary(
+      req.file.originalname,
+      req.file.buffer
+    );
+
+    const newProduct = {
+      name: req.body.name,
+      brand: req.body.brand,
+      description: req.body.description,
+      quantity: Number(req.body.quantity),
+      price: Number(req.body.price),
+      category: req.body.category,
+      inStock: req.body.inStock === "true",
+      image: result.secure_url,
+    };
+    const savedProduct = await productService.createProductsInDb(newProduct);
+    return res
+      .status(201)
+      .json({ status: true, message: "Product created", data: savedProduct });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return res
+      .status(500)
+      .json({ status: false, error: "Image upload failed" });
   }
 };
 const getProducts = async (req: Request, res: Response) => {
@@ -53,9 +62,12 @@ const getProducts = async (req: Request, res: Response) => {
       ...(req.query.maxPrice ? { $lte: Number(req.query.maxPrice) } : {}),
     };
   }
+  const sortOrder = req.query.sortBy === "1" ? 1 : -1;
+  const sortBy = { createdAt: sortOrder };
   //handle paginations
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 3;
+  const allLists = await Bike.countDocuments();
   const skip = (page - 1) * limit;
 
   try {
@@ -63,6 +75,8 @@ const getProducts = async (req: Request, res: Response) => {
       searchQuery: query,
       page,
       limit,
+      skip,
+      sortBy,
     });
     if (result?.data.length < 1) {
       res.status(200).json({
@@ -76,6 +90,7 @@ const getProducts = async (req: Request, res: Response) => {
         data: result,
         total: result?.totalCount,
         currentPage: page,
+        allLists,
         totalPages: Math.ceil(result?.totalCount / limit),
       });
     }
@@ -126,26 +141,60 @@ const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
+// const updateProduct = async (req: Request, res: Response) => {
+//   try {
+//     const result = await productService.updateProductInDb(
+//       req.params.productId,
+//       req.body
+//     );
+//     res.status(200).json({
+//       message: "Bike updated successfully",
+//       status: true,
+//       data: result,
+//     });
+//   } catch (error: any) {
+//     res.status(500).json({
+//       message: error.message,
+//       status: false,
+//       error: error,
+//       stack: error?.stack || "No stack Error",
+//     });
+//   }
+// };
 const updateProduct = async (req: Request, res: Response) => {
   try {
-    const result = await productService.updateProductInDb(
-      req.params.productId,
-      req.body
+    const { productId } = req.params;
+    let updateData = { ...req.body };
+
+    // If a new image is uploaded
+    if (req.file) {
+      const result: any = await sendImageToCloudinary(
+        req.file.originalname,
+        req.file.buffer
+      );
+      updateData.image = result.secure_url;
+    }
+
+    const updatedProduct = await productService.updateProductInDb(
+      productId,
+      updateData
     );
+
     res.status(200).json({
-      message: "Bike updated successfully",
       status: true,
-      data: result,
+      message: "Product updated successfully",
+      data: updatedProduct,
     });
   } catch (error: any) {
+    console.error("Error updating product:", error);
     res.status(500).json({
-      message: error.message,
       status: false,
-      error: error,
-      stack: error?.stack || "No stack Error",
+      message: "Product update failed",
+      error: error.message,
     });
   }
 };
+
 export const productController = {
   createProduct,
   getProducts,

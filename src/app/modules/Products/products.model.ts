@@ -1,6 +1,26 @@
 import mongoose, { model, Schema } from "mongoose";
 import TProducts from "./products.interface";
 
+const reviewSchema = new Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 const BikeModel = new Schema<TProducts>(
   {
     name: {
@@ -28,9 +48,16 @@ const BikeModel = new Schema<TProducts>(
     inStock: {
       type: Boolean,
       required: true,
-      default: function () {
-        return this.quantity > 0;
-      },
+      default: true,
+    },
+    reviews: [reviewSchema],
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    image: {
+      type: String,
+      required: true,
     },
     category: {
       type: String,
