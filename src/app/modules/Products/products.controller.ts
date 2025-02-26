@@ -174,6 +174,10 @@ const updateProduct = async (req: Request, res: Response) => {
       );
       updateData.image = result.secure_url;
     }
+    if (updateData.quantity !== undefined) {
+      updateData.quantity = Number(updateData.quantity);
+      updateData.isStock = updateData.quantity > 0;
+    }
 
     const updatedProduct = await productService.updateProductInDb(
       productId,

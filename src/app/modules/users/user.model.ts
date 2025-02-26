@@ -18,7 +18,7 @@ const userModel = new Schema<TUser>(
     },
     role: {
       type: String,
-      default: "admin",
+      default: "customer",
     },
   },
   {

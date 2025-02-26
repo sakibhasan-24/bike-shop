@@ -11,7 +11,7 @@ export const userSchemaValidation = z.object({
     .enum(["customer", "admin"], {
       message: "Role must be either 'customer' or 'admin'",
     })
-    .default("admin"),
+    .default("customer"),
 });
 export const userLoginSchema = z.object({
   email: z.string().email({ message: "Invalid email format" }),

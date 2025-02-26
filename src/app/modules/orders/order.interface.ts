@@ -1,5 +1,7 @@
-type TOrderProduct = {
-  product: string;
+import mongoose from "mongoose";
+
+export type TOrderProduct = {
+  product: mongoose.Types.ObjectId;
   quantity: number;
   price: number;
 };
