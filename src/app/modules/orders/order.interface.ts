@@ -1,7 +1,18 @@
-type TOrders = {
-  email: string;
+type TOrderProduct = {
   product: string;
   quantity: number;
-  totalPrice: number;
+  price: number;
 };
-export default TOrders;
+
+type TOrder = {
+  email: string;
+  products: TOrderProduct[];
+  totalPrice: number;
+  phone: string;
+  address: string;
+  paymentStatus: "Pending" | "Paid" | "Failed";
+  orderStatus: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  createdAt: Date;
+};
+
+export default TOrder;
