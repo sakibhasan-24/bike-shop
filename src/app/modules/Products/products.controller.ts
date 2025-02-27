@@ -43,7 +43,8 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 const getProducts = async (req: Request, res: Response) => {
-  let query: any = {};
+  // let query: any = {};
+  let query: any = { isDeleted: false };
 
   if (req.query.searchTerm) {
     query = {
@@ -67,7 +68,7 @@ const getProducts = async (req: Request, res: Response) => {
   //handle paginations
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 3;
-  const allLists = await Bike.countDocuments();
+  const allLists = await Bike.countDocuments({ isDeleted: false });
   const skip = (page - 1) * limit;
 
   try {
@@ -141,26 +142,7 @@ const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
-// const updateProduct = async (req: Request, res: Response) => {
-//   try {
-//     const result = await productService.updateProductInDb(
-//       req.params.productId,
-//       req.body
-//     );
-//     res.status(200).json({
-//       message: "Bike updated successfully",
-//       status: true,
-//       data: result,
-//     });
-//   } catch (error: any) {
-//     res.status(500).json({
-//       message: error.message,
-//       status: false,
-//       error: error,
-//       stack: error?.stack || "No stack Error",
-//     });
-//   }
-// };
+
 const updateProduct = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
@@ -198,6 +180,29 @@ const updateProduct = async (req: Request, res: Response) => {
     });
   }
 };
+const softDeleteProduct = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const updatedProduct = await Bike.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({
+      message: "Product soft deleted successfully",
+      data: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Soft Delete Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const productController = {
   createProduct,
@@ -205,4 +210,5 @@ export const productController = {
   getProductsById,
   deleteProduct,
   updateProduct,
+  softDeleteProduct,
 };

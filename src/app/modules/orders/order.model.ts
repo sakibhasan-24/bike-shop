@@ -4,7 +4,7 @@ import TOrder, { TOrderProduct } from "./order.interface";
 const orderProductSchema = new Schema<TOrderProduct>({
   product: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
+    ref: "Bike",
     required: true,
   },
   quantity: {
@@ -43,6 +43,7 @@ const orderSchema = new Schema<TOrder>(
       enum: ["Pending", "Paid", "Failed"],
       default: "Pending",
     },
+    transactionId: { type: String, default: null },
     orderStatus: {
       type: String,
       enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
@@ -52,4 +53,6 @@ const orderSchema = new Schema<TOrder>(
   { timestamps: true }
 );
 
-export default model("Order", orderSchema);
+const Order = model<TOrder>("Order", orderSchema);
+
+export default Order;

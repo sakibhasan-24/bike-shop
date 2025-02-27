@@ -14,6 +14,7 @@ type TOrder = {
   address: string;
   paymentStatus: "Pending" | "Paid" | "Failed";
   orderStatus: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  transactionId: string;
   createdAt: Date;
 };
 

@@ -3,7 +3,7 @@ import config from "../app/config";
 
 const generateToken = (user: any) => {
   const tokenPayload = {
-    _id: user._id,
+    _id: user.id,
     role: user.role,
     email: user.email,
   };

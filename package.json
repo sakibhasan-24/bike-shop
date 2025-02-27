@@ -16,6 +16,8 @@
   "description": "",
   "dependencies": {
     "@types/cookie-parser": "^1.4.8",
+    "@types/stripe": "^8.0.417",
+    "axios": "^1.8.1",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
@@ -26,10 +28,13 @@
     "mongoose": "^8.8.2",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "sslcommerz-lts": "^1.1.0",
+    "stripe": "^17.7.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@types/axios": "^0.14.4",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/eslint__js": "^8.42.3",

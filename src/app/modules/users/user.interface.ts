@@ -3,4 +3,5 @@ export interface TUser {
   email: string;
   password: string;
   role?: string;
+  isBlocked?: boolean;
 }

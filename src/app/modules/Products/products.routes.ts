@@ -12,7 +12,7 @@ router.post(
 );
 router.get("/products", productController.getProducts);
 router.get("/products/:productId", productController.getProductsById);
-router.delete("/products/:productId", productController.deleteProduct);
+router.patch("/products/:id", productController.softDeleteProduct);
 router.put(
   "/products/:productId",
   verifyToken,

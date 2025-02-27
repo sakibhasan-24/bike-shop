@@ -12,6 +12,7 @@ export const userSchemaValidation = z.object({
       message: "Role must be either 'customer' or 'admin'",
     })
     .default("customer"),
+  isBloced: z.boolean().default(false),
 });
 export const userLoginSchema = z.object({
   email: z.string().email({ message: "Invalid email format" }),

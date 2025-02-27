@@ -20,6 +20,10 @@ const userModel = new Schema<TUser>(
       type: String,
       default: "customer",
     },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

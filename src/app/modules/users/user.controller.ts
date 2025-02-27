@@ -72,7 +72,7 @@ const userLogin = catchAsync(
       throw new AppError(401, "Invalid email or password");
     }
     const token = generateToken({
-      id: user.id,
+      id: user._id,
       email: user.email,
       role: user.role,
     });
@@ -96,8 +96,127 @@ const userLogin = catchAsync(
   }
 );
 
-// const userPasswordChange = catchAsync(async());
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const result = await User.find({});
+    res.status(200).json({
+      message: "Users gets successfully",
+      status: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      status: false,
+      error: error,
+    });
+  }
+};
+
+const actionUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    // console.log(userId);
+    console.log(req.user);
+    const adminId = req.user.email;
+    console.log(adminId);
+    const adminUser = await User.findOne({ email: adminId });
+    console.log(adminUser);
+    if (!adminUser || adminUser.role !== "admin") {
+      return res.status(403).json({ message: "Access Denied! Admins Only." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    res.json({
+      message: `User ${user.isBlocked ? "Blocked" : "Unblocked"} Successfully`,
+      user,
+    });
+  } catch (error) {
+    console.error("Error toggling block status:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// const changePassword = async (req: Request, res: Response) => {
+//   try {
+//     const { oldPassword, newPassword } = req.body;
+//     const userId = req.user?.id; // Extract from JWT
+
+//     if (!userId) {
+//       return res.status(401).json({ message: "Unauthorized request" });
+//     }
+
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     const isMatch = await bcryptjs.compare(oldPassword, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: "Old password is incorrect" });
+//     }
+
+//     const salt = await bcryptjs.genSalt(10);
+//     const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+//     user.password = hashedPassword;
+//     await user.save();
+
+//     res.json({ message: "Password updated successfully" });
+//   } catch (error) {
+//     console.error("Error changing password:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    console.log("sssssbi", req.body);
+    console.log(req.user);
+    const userId = req.user?._id; // ✅ Extract user ID from `authMiddleware`
+    console.log("ksakdkjasdnksad", userId);
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized request" });
+    }
+
+    const user = await User.findById(userId);
+    console.log("ssssssss", user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ Compare old password with hashed password in DB
+    const isMatch = await bcryptjs.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    // ✅ Hash new password
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+    // ✅ Update password in database
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 export const userController = {
   userSignUp,
   userLogin,
+  getAllUsers,
+  actionUser,
+  changePassword,
 };

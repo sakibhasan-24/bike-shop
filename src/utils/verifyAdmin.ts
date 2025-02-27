@@ -14,7 +14,7 @@ export const verifyAdmin = async (
 ) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
-    console.log(token, "from admin");
+    // console.log(token, "from admin");
 
     if (!token) {
       throw new AppError(401, "Unauthorized! Please Try Again Later.");

@@ -6,6 +6,7 @@ import { orderRoutes } from "./app/modules/orders/orders.routes";
 import globalErrorHandler from "./middlewares/errorHandler";
 import { userRoutes } from "./app/modules/users/user.routes";
 import cookieParser from "cookie-parser";
+import { paymentRoute } from "./app/modules/payment/payment.routes";
 // const port = 3000;
 app.use(express.json());
 app.use(cookieParser());
@@ -19,6 +20,7 @@ app.use(
 app.use("/api", bikeRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", userRoutes);
+app.use("/api", paymentRoute);
 
 app.use(globalErrorHandler);
 export default app;
