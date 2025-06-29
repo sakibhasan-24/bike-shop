@@ -12,7 +12,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://moto-mart-ht8t3k40j-sakib-hasans-projects.vercel.app/",
+    ],
     credentials: true,
   })
 );
