@@ -16,5 +16,12 @@ router.patch(
 );
 
 router.put("/users/changePassword", verifyToken, userController.changePassword);
+router.put("/users/profile/update", verifyToken, userController.updateProfile);
+router.get(
+  "/users/admin/stat",
+  verifyToken,
+  verifyAdmin,
+  userController.getAdminData
+);
 
 export const userRoutes = router;
