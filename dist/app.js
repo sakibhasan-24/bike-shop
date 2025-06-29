@@ -15,11 +15,20 @@ const payment_routes_1 = require("./app/modules/payment/payment.routes");
 // const port = 3000;
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-app.use((0, cors_1.default)({
-    origin: ["http://localhost:5173", "https://moto-mart.vercel.app/"],
-    credentials: true,
-}));
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "https://moto-mart.vercel.app"],
+//     credentials: true,
+//   })
+// );
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   res.header("Access-Control-Allow-Credentials", "true");
+//   next();
+// });
 // "https://moto-mart-frontend.vercel.app"
+app.use((0, cors_1.default)({
+    origin: "*",
+}));
 app.use("/api", products_routes_1.bikeRoutes);
 app.use("/api", orders_routes_1.orderRoutes);
 app.use("/api", user_routes_1.userRoutes);

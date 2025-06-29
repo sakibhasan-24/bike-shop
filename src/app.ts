@@ -17,11 +17,6 @@ app.use(
   })
 );
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
-
 // "https://moto-mart-frontend.vercel.app"
 app.use("/api", bikeRoutes);
 app.use("/api", orderRoutes);
