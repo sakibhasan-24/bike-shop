@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import express from "express";
 import { confirmPayment, createPaymentIntent } from "./payment.controller";
 

@@ -12,15 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const app_1 = __importDefault(require("./app"));
-const config_1 = __importDefault(require("./app/config"));
-function main() {
+const mongoose_1 = require("mongoose");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const userModel = new mongoose_1.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    email: {
+        type: String,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    role: {
+        type: String,
+        default: "customer",
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    },
+}, {
+    timestamps: true,
+});
+//hash the password before saving it in the database
+userModel.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield mongoose_1.default.connect(config_1.default.DBURL);
-        app_1.default.listen(config_1.default.port, () => {
-            console.log(`Example app listening on port ${config_1.default.port}`);
-        });
+        const user = this;
+        if (!user.isModified("password"))
+            return next();
+        const hashedPassword = bcryptjs_1.default.hashSync(user.password, 12);
+        user.password = hashedPassword;
+        next();
     });
-}
-main();
+});
+const User = (0, mongoose_1.model)("User", userModel);
+exports.default = User;

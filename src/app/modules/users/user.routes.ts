@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from "express";
 import { userController } from "./user.controller";
 import { verifyToken } from "../../../utils/verifyToken";

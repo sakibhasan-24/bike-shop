@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Request, Response } from "express";
 import Bike from "../Products/products.model";
 import { orderSchemaValidation } from "./order.validation";

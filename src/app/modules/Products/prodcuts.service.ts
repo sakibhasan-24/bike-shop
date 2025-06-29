@@ -17,6 +17,7 @@ const getProductDataFromDb = async ({
 
   const totalCount = await Bike.countDocuments(searchQuery);
 
+  console.log(searchQuery);
   const data = await Bike.find(searchQuery)
     .skip(skip)
     .limit(limit)

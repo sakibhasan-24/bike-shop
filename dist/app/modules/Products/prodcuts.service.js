@@ -19,12 +19,18 @@ const createProductsInDb = (product) => __awaiter(void 0, void 0, void 0, functi
     const result = yield bikeResult.save();
     return result;
 });
-const getProductDataFromDb = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (searchTerm = {}) {
-    const result = yield products_model_1.default.find(searchTerm);
-    return result;
+const getProductDataFromDb = (_a) => __awaiter(void 0, [_a], void 0, function* ({ searchQuery, page, limit, sortBy, }) {
+    const skip = (page - 1) * limit;
+    const totalCount = yield products_model_1.default.countDocuments(searchQuery);
+    const data = yield products_model_1.default.find(searchQuery)
+        .skip(skip)
+        .limit(limit)
+        .sort(sortBy)
+        .exec();
+    return { data, totalCount };
 });
 const getroductByIdFromDb = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield products_model_1.default.findById(id);
+    const result = yield products_model_1.default.findOne({ _id: id });
     console.log(id, "ser");
     if (!result) {
         throw new Error("Bike not found");

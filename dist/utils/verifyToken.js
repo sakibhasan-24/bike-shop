@@ -12,15 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const app_1 = __importDefault(require("./app"));
-const config_1 = __importDefault(require("./app/config"));
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield mongoose_1.default.connect(config_1.default.DBURL);
-        app_1.default.listen(config_1.default.port, () => {
-            console.log(`Example app listening on port ${config_1.default.port}`);
-        });
-    });
-}
-main();
+exports.verifyToken = void 0;
+const config_1 = __importDefault(require("../app/config"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const AppError_1 = __importDefault(require("./AppError"));
+const verifyToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+    // console.log("ssss", token);
+    if (!token) {
+        throw new AppError_1.default(401, "Unauthorized! Please check your credentials");
+    }
+    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.JWT_SECRET);
+    console.log(decoded);
+    req.user = decoded;
+    next();
+});
+exports.verifyToken = verifyToken;

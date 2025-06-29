@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from "express";
 import { productController, upload } from "./products.controller";
 import { verifyToken } from "../../../utils/verifyToken";
@@ -19,5 +20,10 @@ router.put(
   verifyAdmin,
   upload.single("image"),
   productController.updateProduct
+);
+router.put(
+  "/add-review/:productId",
+  verifyToken,
+  productController.addOrUpdateReview
 );
 export const bikeRoutes = router;

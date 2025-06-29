@@ -5,6 +5,8 @@ import { productService } from "./prodcuts.service";
 import Bike from "./products.model";
 import { sendImageToCloudinary } from "../../../utils/cloudinary";
 import multer from "multer";
+import User from "../users/user.model";
+import mongoose from "mongoose";
 export const upload = multer({ storage: multer.memoryStorage() });
 
 const createProduct = async (req: Request, res: Response) => {
@@ -43,19 +45,22 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 const getProducts = async (req: Request, res: Response) => {
-  // let query: any = {};
   let query: any = { isDeleted: false };
 
-  if (req.query.searchTerm) {
-    query = {
-      $or: [
-        { name: { $regex: req.query.searchTerm, $options: "i" } },
-        { brand: { $regex: req.query.searchTerm, $options: "i" } },
-        { category: { $regex: req.query.searchTerm, $options: "i" } },
-      ],
-    };
+  if (req?.query?.searchTerm) {
+    query.$or = [
+      { name: { $regex: req.query.searchTerm, $options: "i" } },
+      { brand: { $regex: req.query.searchTerm, $options: "i" } },
+      { category: { $regex: req.query.searchTerm, $options: "i" } },
+    ];
   }
-  //   console.log(req.query, "query");
+
+  // console.log(req.query, "query");
+  if (req.query.category && req.query.category !== "") {
+    query.category = req.query.category;
+  }
+
+  // console.log(req.query, "query");
   // handle price ranges
   if (req.query.minPrice || req.query.maxPrice) {
     query.price = {
@@ -70,7 +75,7 @@ const getProducts = async (req: Request, res: Response) => {
   const limit = parseInt(req.query.limit as string) || 3;
   const allLists = await Bike.countDocuments({ isDeleted: false });
   const skip = (page - 1) * limit;
-
+  // console.log(query, "query");
   try {
     const result = await productService.getProductDataFromDb({
       searchQuery: query,
@@ -79,6 +84,8 @@ const getProducts = async (req: Request, res: Response) => {
       skip,
       sortBy,
     });
+    // console.log("Final Mongo query:", JSON.stringify(query, null, 2));
+
     if (result?.data.length < 1) {
       res.status(200).json({
         message: "No Bike Found",
@@ -204,6 +211,44 @@ const softDeleteProduct = async (req: Request, res: Response) => {
   }
 };
 
+const addOrUpdateReview = async (req: Request, res: Response) => {
+  // // Add or update review logic here
+  // console.log(req.body, "req.body");
+  // console.log(req.params.productId, "productId");
+  const { userId, rating, text } = req.body;
+  const productId = req.params.productId;
+  const user = await User.findById(userId);
+  if (!user || user?.role === "admin") {
+    return res.status(404).json({ message: "You Can not Give review" });
+  }
+  const product = await Bike.findById(productId);
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+  //already review.
+  const reviewExists =
+    product?.reviews &&
+    product.reviews.find((review) => review?.user.toString() === userId);
+  if (reviewExists) {
+    reviewExists.rating = rating;
+    reviewExists.text = text;
+    await product.save();
+    return res.status(200).json({ message: "Review updated successfully" });
+  }
+  product && product.reviews.push({ user: userId, rating, text });
+
+  //calculate average
+  const totalRating = product.reviews.reduce(
+    (acc, review) => acc + review.rating,
+    0
+  );
+  product.averageRating = totalRating / product?.reviews.length;
+  await product.save();
+  console.log(product);
+  return res
+    .status(200)
+    .json({ message: "Review added successfully", success: true, product });
+};
 export const productController = {
   createProduct,
   getProducts,
@@ -211,4 +256,5 @@ export const productController = {
   deleteProduct,
   updateProduct,
   softDeleteProduct,
+  addOrUpdateReview,
 };

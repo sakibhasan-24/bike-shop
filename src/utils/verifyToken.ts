@@ -11,7 +11,6 @@ export const verifyToken = async (
   next: NextFunction
 ) => {
   const token = req.headers.authorization?.split(" ")[1];
-  // console.log("ssss", token);
   if (!token) {
     throw new AppError(401, "Unauthorized! Please check your credentials");
   }

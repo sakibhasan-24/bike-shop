@@ -32,7 +32,8 @@ const userModel = new Schema<TUser>(
 
 //hash the password before saving it in the database
 userModel.pre("save", async function (next) {
-  const user = this as TUser;
+  const user = this as any;
+  if (!user.isModified("password")) return next();
   const hashedPassword = bcrypt.hashSync(user.password, 12);
   user.password = hashedPassword;
   next();
