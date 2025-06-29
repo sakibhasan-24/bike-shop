@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 const app = express();
 import cors from "cors";
 import { bikeRoutes } from "./app/modules/Products/products.routes";
@@ -10,17 +10,17 @@ import { paymentRoute } from "./app/modules/payment/payment.routes";
 // const port = 3000;
 app.use(express.json());
 app.use(cookieParser());
-// app.use(
-//   cors({
-//     origin: ["http://localhost:5173", "https://moto-mart.vercel.app"],
-//     credentials: true,
-//   })
-// );
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:5173", "https://moto-mart.vercel.app"],
+    credentials: true,
   })
 );
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 // "https://moto-mart-frontend.vercel.app"
 app.use("/api", bikeRoutes);
