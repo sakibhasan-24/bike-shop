@@ -16,7 +16,11 @@ const payment_routes_1 = require("./app/modules/payment/payment.routes");
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:5173", "https://moto-mart-frontend.vercel.app"],
+    origin: [
+        "http://localhost:5173",
+        "https://moto-mart-frontend.vercel.app",
+        "https://moto-mart-6pb7fbyn6-sakib-hasans-projects.vercel.app/",
+    ],
     credentials: true,
 }));
 app.use("/api", products_routes_1.bikeRoutes);
