@@ -19,7 +19,6 @@ const AppError_1 = __importDefault(require("./AppError"));
 const verifyToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-    // console.log("ssss", token);
     if (!token) {
         throw new AppError_1.default(401, "Unauthorized! Please check your credentials");
     }

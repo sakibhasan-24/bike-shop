@@ -225,7 +225,10 @@ const addOrUpdateReview = async (req: Request, res: Response) => {
   if (!product) {
     return res.status(404).json({ message: "Product not found" });
   }
-  //already review.
+
+  if (!product.reviews) {
+    product.reviews = [];
+  }
   const reviewExists =
     product?.reviews &&
     product.reviews.find((review) => review?.user.toString() === userId);

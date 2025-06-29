@@ -17,6 +17,7 @@ const prodcuts_service_1 = require("./prodcuts.service");
 const products_model_1 = __importDefault(require("./products.model"));
 const cloudinary_1 = require("../../../utils/cloudinary");
 const multer_1 = __importDefault(require("multer"));
+const user_model_1 = __importDefault(require("../users/user.model"));
 exports.upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -50,18 +51,20 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // let query: any = {};
+    var _a;
     let query = { isDeleted: false };
-    if (req.query.searchTerm) {
-        query = {
-            $or: [
-                { name: { $regex: req.query.searchTerm, $options: "i" } },
-                { brand: { $regex: req.query.searchTerm, $options: "i" } },
-                { category: { $regex: req.query.searchTerm, $options: "i" } },
-            ],
-        };
+    if ((_a = req === null || req === void 0 ? void 0 : req.query) === null || _a === void 0 ? void 0 : _a.searchTerm) {
+        query.$or = [
+            { name: { $regex: req.query.searchTerm, $options: "i" } },
+            { brand: { $regex: req.query.searchTerm, $options: "i" } },
+            { category: { $regex: req.query.searchTerm, $options: "i" } },
+        ];
     }
-    //   console.log(req.query, "query");
+    // console.log(req.query, "query");
+    if (req.query.category && req.query.category !== "") {
+        query.category = req.query.category;
+    }
+    // console.log(req.query, "query");
     // handle price ranges
     if (req.query.minPrice || req.query.maxPrice) {
         query.price = Object.assign(Object.assign({}, (req.query.minPrice ? { $gte: Number(req.query.minPrice) } : {})), (req.query.maxPrice ? { $lte: Number(req.query.maxPrice) } : {}));
@@ -73,6 +76,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const limit = parseInt(req.query.limit) || 3;
     const allLists = yield products_model_1.default.countDocuments({ isDeleted: false });
     const skip = (page - 1) * limit;
+    // console.log(query, "query");
     try {
         const result = yield prodcuts_service_1.productService.getProductDataFromDb({
             searchQuery: query,
@@ -81,6 +85,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             skip,
             sortBy,
         });
+        // console.log("Final Mongo query:", JSON.stringify(query, null, 2));
         if ((result === null || result === void 0 ? void 0 : result.data.length) < 1) {
             res.status(200).json({
                 message: "No Bike Found",
@@ -190,6 +195,41 @@ const softDeleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ message: "Server error" });
     }
 });
+const addOrUpdateReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // // Add or update review logic here
+    // console.log(req.body, "req.body");
+    // console.log(req.params.productId, "productId");
+    const { userId, rating, text } = req.body;
+    const productId = req.params.productId;
+    const user = yield user_model_1.default.findById(userId);
+    if (!user || (user === null || user === void 0 ? void 0 : user.role) === "admin") {
+        return res.status(404).json({ message: "You Can not Give review" });
+    }
+    const product = yield products_model_1.default.findById(productId);
+    if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+    }
+    if (!product.reviews) {
+        product.reviews = [];
+    }
+    const reviewExists = (product === null || product === void 0 ? void 0 : product.reviews) &&
+        product.reviews.find((review) => (review === null || review === void 0 ? void 0 : review.user.toString()) === userId);
+    if (reviewExists) {
+        reviewExists.rating = rating;
+        reviewExists.text = text;
+        yield product.save();
+        return res.status(200).json({ message: "Review updated successfully" });
+    }
+    product && product.reviews.push({ user: userId, rating, text });
+    //calculate average
+    const totalRating = product.reviews.reduce((acc, review) => acc + review.rating, 0);
+    product.averageRating = totalRating / (product === null || product === void 0 ? void 0 : product.reviews.length);
+    yield product.save();
+    console.log(product);
+    return res
+        .status(200)
+        .json({ message: "Review added successfully", success: true, product });
+});
 exports.productController = {
     createProduct,
     getProducts,
@@ -197,4 +237,5 @@ exports.productController = {
     deleteProduct,
     updateProduct,
     softDeleteProduct,
+    addOrUpdateReview,
 };

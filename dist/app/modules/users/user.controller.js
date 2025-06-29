@@ -170,10 +170,207 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+const products_model_1 = __importDefault(require("../Products/products.model"));
+const order_model_1 = __importDefault(require("../orders/order.model"));
+const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+        const { name, email } = req.body;
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized", success: false });
+        }
+        if (!name && !email) {
+            return res
+                .status(400)
+                .json({ message: "Name and email are required", success: false });
+        }
+        const user = yield user_model_1.default.findById(userId);
+        if (!user) {
+            return res
+                .status(404)
+                .json({ message: "User not found", success: false });
+        }
+        user.name = name;
+        user.email = email;
+        yield user.save();
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+        });
+    }
+    catch (error) {
+        console.error("Update profile error:", error);
+        if (error.code === 11000 && ((_b = error.keyPattern) === null || _b === void 0 ? void 0 : _b.email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Email already in use",
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: "Server error while updating profile",
+        });
+    }
+});
+// const getAdminData = async (req: Request, res: Response) => {
+//   const user = req.user?._id;
+//   try {
+//     const admin = await User.findById(user);
+//     if (!admin) {
+//       return res
+//         .status(404)
+//         .json({ message: "Admin not found", success: false });
+//     }
+//     if (admin.role !== "admin") {
+//       return res.status(403).json({ message: "Forbidden", success: false });
+//     }
+//     const totalProducts = await Product.countDocuments();
+//     const totalUsers = await User.countDocuments();
+//     const activeUsers = await User.countDocuments({ isBlocked: false });
+//     const blockedUsers = await User.countDocuments({ isBlocked: true });
+//     const totalOrders = await Order.countDocuments();
+//     const pendingOrders = await Order.countDocuments({ status: "pending" });
+//     const shippedOrders = await Order.countDocuments({ status: "shipped" });
+//     const processingOrders = await Order.countDocuments({
+//       status: "processing",
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ message: "Server error", success: false });
+//   }
+// };
+// const getAdminData = async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.user?._id;
+//     const admin = await User.findById(userId);
+//     if (!admin) {
+//       return res
+//         .status(404)
+//         .json({ message: "Admin not found", success: false });
+//     }
+//     if (admin.role !== "admin") {
+//       return res.status(403).json({ message: "Forbidden", success: false });
+//     }
+//     // 📦 Products
+//     const totalProducts = await Bike.countDocuments();
+//     // 👥 Users
+//     const totalUsers = await User.countDocuments();
+//     const activeUsers = await User.countDocuments({ isBlocked: false });
+//     const blockedUsers = await User.countDocuments({ isBlocked: true });
+//     // 📦 Orders
+//     const totalOrders = await Order.countDocuments();
+//     const pendingOrders = await Order.countDocuments({
+//       orderStatus: "pending",
+//     });
+//     const shippedOrders = await Order.countDocuments({
+//       orderStatus: "shipped",
+//     });
+//     const processingOrders = await Order.countDocuments({
+//       orderStatus: "processing",
+//     });
+//     // 💰 Revenue: sum of totalPrice for "processing" orders
+//     const processingOrderDocs = await Order.find({ orderStatus: "processing" });
+//     const totalRevenue = processingOrderDocs.reduce((sum, order) => {
+//       return sum + (order.totalPrice || 0);
+//     }, 0);
+//     // 📊 Final Response
+//     return res.status(200).json({
+//       success: true,
+//       stats: {
+//         totalProducts,
+//         totalUsers,
+//         activeUsers,
+//         blockedUsers,
+//         totalOrders,
+//         pendingOrders,
+//         shippedOrders,
+//         processingOrders,
+//         totalRevenue: parseFloat(totalRevenue.toFixed(2)),
+//         pendingOrderPercentage: totalOrders
+//           ? parseFloat(((pendingOrders / totalOrders) * 100).toFixed(2))
+//           : 0,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching admin stats:", error);
+//     return res.status(500).json({ message: "Server error", success: false });
+//   }
+// };
+const getAdminData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+        const admin = yield user_model_1.default.findById(userId);
+        if (!admin) {
+            return res
+                .status(404)
+                .json({ message: "Admin not found", success: false });
+        }
+        if (admin.role !== "admin") {
+            return res.status(403).json({ message: "Forbidden", success: false });
+        }
+        // 📦 Products
+        const totalProducts = yield products_model_1.default.countDocuments();
+        // 👥 Users
+        const totalUsers = yield user_model_1.default.countDocuments();
+        const activeUsers = yield user_model_1.default.countDocuments({ isBlocked: false });
+        const blockedUsers = yield user_model_1.default.countDocuments({ isBlocked: true });
+        // 📦 Orders
+        const totalOrders = yield order_model_1.default.countDocuments();
+        const deliveredOrders = yield order_model_1.default.countDocuments({
+            orderStatus: "Delivered",
+        });
+        const shippedOrders = yield order_model_1.default.countDocuments({
+            orderStatus: "Shipped",
+        });
+        const processingOrders = yield order_model_1.default.countDocuments({
+            orderStatus: "Processing",
+        });
+        const pendingOrders = yield order_model_1.default.countDocuments({
+            orderStatus: { $in: ["Shipped", "Processing"] },
+            paymentStatus: "Pending",
+        });
+        // 💰 Revenue: sum of totalPrice where paymentStatus is "paid"
+        const paidOrders = yield order_model_1.default.find({ paymentStatus: "Paid" });
+        const totalRevenue = paidOrders.reduce((sum, order) => {
+            return sum + (order.totalPrice || 0);
+        }, 0);
+        return res.status(200).json({
+            success: true,
+            stats: {
+                totalProducts,
+                totalUsers,
+                activeUsers,
+                blockedUsers,
+                totalOrders,
+                deliveredOrders,
+                pendingOrders,
+                shippedOrders,
+                processingOrders,
+                totalRevenue: parseFloat(totalRevenue.toFixed(2)),
+                pendingOrderPercentage: totalOrders
+                    ? parseFloat(((pendingOrders / totalOrders) * 100).toFixed(2))
+                    : 0,
+            },
+        });
+    }
+    catch (error) {
+        console.error("Error fetching admin stats:", error);
+        return res.status(500).json({ message: "Server error", success: false });
+    }
+});
 exports.userController = {
     userSignUp,
     userLogin,
     getAllUsers,
     actionUser,
     changePassword,
+    updateProfile,
+    getAdminData,
 };

@@ -15,4 +15,5 @@ router.get("/products", products_controller_1.productController.getProducts);
 router.get("/products/:productId", products_controller_1.productController.getProductsById);
 router.patch("/products/:id", products_controller_1.productController.softDeleteProduct);
 router.put("/products/:productId", verifyToken_1.verifyToken, verifyAdmin_1.verifyAdmin, products_controller_1.upload.single("image"), products_controller_1.productController.updateProduct);
+router.put("/add-review/:productId", verifyToken_1.verifyToken, products_controller_1.productController.addOrUpdateReview);
 exports.bikeRoutes = router;

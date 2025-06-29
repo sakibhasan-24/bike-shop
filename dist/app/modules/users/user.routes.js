@@ -15,4 +15,6 @@ router.post("/auth/login", user_controller_1.userController.userLogin);
 router.get("/users", verifyToken_1.verifyToken, verifyAdmin_1.verifyAdmin, user_controller_1.userController.getAllUsers);
 router.patch("/users/:userId", verifyToken_1.verifyToken, verifyAdmin_1.verifyAdmin, user_controller_1.userController.actionUser);
 router.put("/users/changePassword", verifyToken_1.verifyToken, user_controller_1.userController.changePassword);
+router.put("/users/profile/update", verifyToken_1.verifyToken, user_controller_1.userController.updateProfile);
+router.get("/users/admin/stat", verifyToken_1.verifyToken, verifyAdmin_1.verifyAdmin, user_controller_1.userController.getAdminData);
 exports.userRoutes = router;
