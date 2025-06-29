@@ -12,11 +12,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://moto-mart-frontend.vercel.app"],
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
-
+// "https://moto-mart-frontend.vercel.app"
 app.use("/api", bikeRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", userRoutes);
