@@ -10,12 +10,18 @@ import { paymentRoute } from "./app/modules/payment/payment.routes";
 // const port = 3000;
 app.use(express.json());
 app.use(cookieParser());
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "https://moto-mart.vercel.app"],
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://moto-mart.vercel.app"],
-    credentials: true,
+    origin: "*",
   })
 );
+
 // "https://moto-mart-frontend.vercel.app"
 app.use("/api", bikeRoutes);
 app.use("/api", orderRoutes);
